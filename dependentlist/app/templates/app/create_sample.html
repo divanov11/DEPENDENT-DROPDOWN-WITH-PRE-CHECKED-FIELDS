@@ -1,0 +1,77 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<h3>Create Sample</h3>
+
+<form>
+	{% csrf_token %}
+	{{form.as_p}}
+
+	<div id="tests">
+		<hr>
+		<p><strong>Tests</strong></p>
+	</div>
+
+	<input type="submit">
+</form>
+
+<script>
+
+
+	function addTests(tests){
+		$('#tests').empty()
+		for (var i = 0; i < tests.length; i++){
+	        var test = `
+	        <div class="test-check">
+	          <input id="${tests[i].id}" class="checkbox" type="checkbox" name="tests" value="${tests[i].id}"> ${tests[i].name}<br>
+	        </div>
+	        `
+
+	        $('#tests').append(test)
+    	}
+    	$( "#id_package" ).trigger( "change" );
+	}
+
+	function checkTests(tests, checks){
+		var checksList = []
+		for (var i = 0; i < checks.length; i++){
+
+			$('#' + checks[i].id).prop('checked', false);
+			checksList.push(parseInt(checks[i].value))
+    	}
+
+		for (var i = 0; i < tests.length; i++){
+			
+			if (checksList.includes(tests[i].id)){
+				 $('#' + tests[i].id).prop('checked', true);
+			}
+    	}
+	}
+
+	$('#id_fuel').change(function(){
+		id = this.value
+		var url = 'http://127.0.0.1:8000/api/' + id + '/'
+
+		$.ajax({
+              url:url,
+              success:function(tests){
+             	addTests(tests)
+              }
+           });
+	})
+
+	$('#id_package').change(function(){
+		id = this.value
+
+		if (id){
+			var url = 'http://127.0.0.1:8000/api/package/' + id + '/'
+			var checks = $('.checkbox')
+
+			$.ajax({
+	              url:url,
+	              success:function(tests){
+	             	checkTests(tests, checks)
+	              }
+	           });
+		}
+	})
+</script>
